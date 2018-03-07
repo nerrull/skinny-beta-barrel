@@ -1,0 +1,201 @@
+===============================================================================================================================
+================================================= prepare pdb data ============================================================
+===============================================================================================================================
+
+pdbs/:
+	folder contains pdb data and results
+pdbs/ca:
+	folder contains constructed ca pdbs
+pdbs/bb:
+	folder contains constructed bb pdbs
+pdbs/sc:
+	folder contains constructed sc pdbs
+pdbs/pdb_ca:
+	folder contains ca pdbs extracted from real pdbs
+pdbs/pdb_bb:
+	folder contains bb pdbs extracted from real pdbs
+pdbs/pdb_sc:
+	folder contains sc pdbs extracted from real pdbs
+pdbs/process_pdbs.py
+	script extracts pdbs from real pdbs
+pdbs/nmr
+	folder contians real nmr pdbs
+pdbs/nmr_splits
+	folder contains single model pdbs extraced from nmr pdbs
+pdbs/split_nmr.py
+	scritp extract models from nmr pdbs
+pdbs/residues
+	folder contains files of residue seqids of different regions of OMPs
+pdbs/reindexmap
+	folder contains temporary files in pdb construction
+pdbs/tmppdbs
+	folder contains temporary files in pdb construction
+
+
+Workflow:
+
+	(1) extract pdb of different resilution
+
+		python process_pdbs.py
+
+	(1) split nmr pdbs
+
+		python split_nmr.py
+
+
+
+
+
+===============================================================================================================================
+============================================== barrel model selection =========================================================
+===============================================================================================================================
+
+
+model_selection.old/:
+	similar to the none old ones, but this cannot keep the geometric properties of barrels from the dataset, so discarded
+model_selection/:
+	folder contains scripts and results to select barrel model and params
+model_selection/model_selection_construct_barrel.py:
+	script to construct barrel with different models and params using the true regs
+model_selection/model_selection_get_rmsds.py:
+	script to calculate rmsd of the barrels constructed from  < model_selection_construct_barrel.py >  
+model_selection/model_selection_rmsd_2zz.rlt:
+	rmsd results of 2zz model
+model_selection/model_selection_rmsd_2zz.dirns:
+	part of inputs for script  < model_selection_get_rmsds.py >  to calculate  < model_selection_rmsd_2zz.rlt >  
+
+model_selection/model_selection_Adrdw_search/:
+	folder contains searching scripts and results of params that keep the geometric properties of barrels from the dataset
+model_selection/model_selection_Adrdw_search/Adrdw_search.py:
+	script searches params that preserves the geometric properties of barrels from the dataset
+model_selection/model_selection_Adrdw_search/Adrdw.rlt:
+	searching results
+model_selection/model_selection_Adrdw_search/process_result.py:
+	script that processes the searching results
+model_selection/model_selection_Adrdw_search/processed.rlt:
+	processed results
+
+
+Workflow:
+
+	(0) all the scripts need to be moved to paranet folder in order to be used
+
+		mv model_selection/*.py .                               (in  < . >  )
+
+	(1) find the params that satisfy the geometric properties
+
+		python Adrdw_search.py > Adrdw.rlt             (in  < model_selection_Adrdw_search/ >  )
+		python process_results.py > processed.rlt      (in  < model_selection_Adrdw_search/ >  )
+
+	(2) use script  < model_selection_construct_barrel.py >  to find THE param set gives best rmsd
+
+		python model_selection_construct_barrel.py > model_selection_rmsd_2zz.dirns      (in  < ./ >  )
+		python model_selection_get_rmsds.py > model_selection_rmsd_2zz.rlt               (in  < ./ >  )
+
+	(3) move everything back
+
+		mv model_selection_* model_selection
+
+
+
+
+
+===============================================================================================================================
+========================================= param and asjustment selection ======================================================
+===============================================================================================================================
+
+param_selection:
+	folder contains scripts and results to select params using results of registration prediction
+param_selection/param_selection_construct_barrel.py:
+	script to construct barrel with registration prediction results from different params
+param_selection/param_selection_get_rmsds.py:
+	script to calculate rmsd of the barrels constructed from  < param_selection_construct_barrel.py >  
+param_selection/param_selection_rmsd.rlt:
+	rmsd results
+param_selection/param_selection_rmsd_randomimprovement.rlt:
+	rmsd results of random improvement test
+
+
+Workflow:
+
+	(0) all the scripts need to be moved to paranet folder in order to be used
+
+		mv *.py ../                               (in  < param_selection >  )
+
+	(1) change the comment section in  < param_selection_construct_barrel.py >  accordingly, and run the script
+
+	(2) change the comment section in  < param_selection_get_rmsds.py >  accordingly, and run the script
+
+
+
+
+
+===============================================================================================================================
+====================================== prepare inputs for barrel construction =================================================
+===============================================================================================================================
+
+construction_inputs/:
+	folder contains scripts and processed inputs
+construction_inputs/process.py:
+	scripts to process inputs
+construction_inputs/results:
+	(un)processed inputs for barrel construction
+
+
+Workflow:
+
+	(1) Copy adjusted registration to this folder
+
+		cp ../../bb-reg/shear_adjustment/results/* ./results/ -r
+
+	(2) Use script  < process.py >  to process the inputs
+
+		python process.py results/w110010080_o1
+
+
+
+
+
+===============================================================================================================================
+=============================================== barrel construction ===========================================================
+===============================================================================================================================
+
+all_rmsd.py:
+	portal script to calculate rmsd
+calc_rmsd.py
+	actual script to calculate rmsd
+all_rmsd.txt
+	rmsd results
+construct_ca_pdb.py:
+	script to construct calpha pdbs
+construct_bb_pdb.py:
+	script to construct backbone pdbs
+construct_sc_pdb.py:
+	script to construct side-chain pdbs
+correct_index_and_trim.py:
+	script to corret the intermediate seqid and trim the auxilary residues in pdb construction
+
+scripts:
+	folder contains scripts to construct pdbs
+scripts/barrel_2zz.py:
+	script to construct 2zz barrel models
+scripts/BBQ:
+	code to construct backbone from calpha trace. ref: PMID: 17342707
+scripts/pdb_info.py:
+	script to read pdb info from  < pdb_info.list >  
+scripts/selection_barrel_2zz.py:
+	same as  < scripts/barrel_2zz.py >  , just some small modification faciliates model/param selection
+
+
+Workflow:
+
+	(1) construct ca pdbs
+	(2) construct bb and sc pdbs
+	(3) correct and trim pdbs
+	(4) calculate rmsds
+
+
+
+
+
+
